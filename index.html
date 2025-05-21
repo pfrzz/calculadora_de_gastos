@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Calculadora de Gastos</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 0 20px;
+      max-width: 800px;
+      margin: auto;
+    }
+    h1 {
+      text-align: center;
+      margin-top: 20px;
+      color: #333;
+    }
+    form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    form input, form button {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    form button {
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    form button:hover {
+      background-color: #0056b3;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      background: white;
+      border: 1px solid #ddd;
+      margin-bottom: 5px;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    canvas {
+      max-width: 100%;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Calculadora de Gastos</h1>
+  <form id="form-despesa">
+    <input type="text" id="categoria" placeholder="Categoria" required />
+    <input type="number" id="valor" placeholder="Valor" required />
+    <input type="date" id="data" required />
+    <button type="submit">Adicionar</button>
+  </form>
+
+  <ul id="lista-despesas"></ul>
+
+  <canvas id="graficoPizza"></canvas>
+
+  <script>
+    const form = document.getElementById('form-despesa');
+    const lista = document.getElementById('lista-despesas');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const categoria = document.getElementById('categoria').value;
+      const valor = parseFloat(document.getElementById('valor').value);
+      const data = document.getElementById('data').value;
+      const despesa = { categoria, valor, data };
+      const despesas = JSON.parse(localStorage.getItem('despesas')) || [];
+      despesas.push(despesa);
+      localStorage.setItem('despesas', JSON.stringify(despesas));
+      form.reset();
+      renderDespesas();
+      renderGraficoPizza();
+    });
+
+    function renderDespesas() {
+      const despesas = JSON.parse(localStorage.getItem('despesas')) || [];
+      lista.innerHTML = '';
+      despesas.forEach((d) => {
+        const item = document.createElement('li');
+        item.textContent = `${d.categoria} - R$ ${d.valor.toFixed(2)} - ${d.data}`;
+        lista.appendChild(item);
+      });
+    }
+
+    function renderGraficoPizza() {
+      const despesas = JSON.parse(localStorage.getItem('despesas')) || [];
+      const categorias = {};
+
+      despesas.forEach((d) => {
+        categorias[d.categoria] = (categorias[d.categoria] || 0) + d.valor;
+      });
+
+      const ctx = document.getElementById('graficoPizza').getContext('2d');
+      if (window.meuGrafico) {
+        window.meuGrafico.destroy();
+      }
+      window.meuGrafico = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: Object.keys(categorias),
+          datasets: [{
+            data: Object.values(categorias),
+            backgroundColor: ['#f88', '#8f8', '#88f', '#ff8', '#8ff']
+          }]
+        }
+      });
+    }
+
+    renderDespesas();
+    renderGraficoPizza();
+  </script>
+</body>
+</html>
