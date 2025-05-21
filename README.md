@@ -14,7 +14,7 @@ localStorage
 
 Clone este repositório para sua máquina local:
 
-git clone https://github.com/seuusuario/calculadora-gastos.git
+git clone [https://github.com/seuusuario/calculadora-gastos.git](https://github.com/pfrzz/calculadora_de_gastos)
 
 Acesse a pasta do projeto:
 
